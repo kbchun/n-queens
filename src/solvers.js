@@ -16,14 +16,19 @@
 var allSolutions = function(n, chessPieces) {
   var emptyBoard;
   var solutions = [];
+  var conflictChecker;
+
+  if (chessPieces === 'rooks') {
+    conflictChecker = 'hasAnyRooksConflicts';
+  } else if (chessPieces === 'queens') {
+    conflictChecker = 'hasAnyQueensConflicts';
+  }
 
   var helper = function(n, row, col, board) {
     // toggle and add piece to row, col
     board.togglePiece(row, col);
 
-    // if dealing with queens
-    if (chessPieces === 'queens') {
-      if (!board.hasAnyQueensConflicts()) {
+      if (!board[conflictChecker]()) {
         // check if solution
         // solution found if in last last row and no conflicts
         if (row === n - 1) {
@@ -45,32 +50,6 @@ var allSolutions = function(n, chessPieces) {
           }
         }
       }
-
-    // if dealing with rooks
-    } else if (chessPieces === 'rooks') {
-      if (!board.hasAnyRooksConflicts()) {
-        // check if solution
-        // solution found if in last last row and no conflicts
-        if (row === n - 1) {
-          var matrix = _.map(board.rows(), function(row) { return row.slice(); });
-
-          // add solution
-          solutions.push(matrix);
-
-        } else {
-          // if valid move but not solution
-          for (var colIndex = 0; colIndex < n; colIndex++) {
-            // check if board will be out of bounds if you increase row by 1
-            if (!board._isInBounds(row + 1, colIndex)) {
-              return;
-            }
-
-            // find possible boards
-            helper(n, row + 1, colIndex, board);
-          }
-        }
-      }
-    }
     // toggle and remove piece
     board.togglePiece(row, col);
   };
